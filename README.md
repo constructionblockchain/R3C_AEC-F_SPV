@@ -1,5 +1,4 @@
-# Generic Special Purpose Vehicle (SPV) Module (R3C_AEC-F_SPV)
-R3 Corda: AEC Finance: Generic Contract: Construction
+# Special Purpose Vehicle (SPV) Module (R3C_AEC-F_SPV)
 
 ## What are SPVs?
 * An organisation (mutual, ltd company, trust, private-public partnership...). They are the party that agrees the loands, construction contracts, etc. with all the other parties in a construction finance project
