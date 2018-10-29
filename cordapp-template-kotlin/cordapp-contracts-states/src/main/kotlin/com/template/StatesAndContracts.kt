@@ -5,6 +5,7 @@ import net.corda.core.contracts.Contract
 import net.corda.core.contracts.ContractState
 import net.corda.core.identity.AbstractParty
 import net.corda.core.transactions.LedgerTransaction
+import net.corda.core.identity.Party
 
 // *****************
 // * Contract Code *
@@ -29,6 +30,21 @@ class TemplateContract : Contract {
 // *********
 // * State *
 // *********
+
+
 data class TemplateState(val data: String) : ContractState {
     override val participants: List<AbstractParty> = listOf()
 }
+
+
+// *******
+// * IOU *
+// *******
+
+data class IOUState(val value: Int,
+                    val lender: Party,
+                    val borrower: Party) : ContractState {
+    override val participants get() = listOf(lender, borrower)
+}
+
+

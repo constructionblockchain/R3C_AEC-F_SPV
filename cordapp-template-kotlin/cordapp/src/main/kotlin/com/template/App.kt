@@ -11,6 +11,10 @@ import javax.ws.rs.Path
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
+import net.corda.core.contracts.Command
+import net.corda.core.identity.Party
+import net.corda.core.transactions.TransactionBuilder
+import net.corda.core.utilities.ProgressTracker
 
 // *****************
 // * API Endpoints *
@@ -29,20 +33,36 @@ class TemplateApi(val rpcOps: CordaRPCOps) {
 // *********
 // * Flows *
 // *********
+
 @InitiatingFlow
 @StartableByRPC
-class Initiator : FlowLogic<Unit>() {
-    @Suspendable
-    override fun call() {
-        // Flow implementation goes here
-    }
-}
+class IOUFlow(val iouValue: Int,
+              val otherParty: Party) : FlowLogic<Unit>() {
 
-@InitiatedBy(Initiator::class)
-class Responder(val counterpartySession: FlowSession) : FlowLogic<Unit>() {
+    //Progress tracker provides checkpoints in flow progress
+    override val progressTracker = ProgressTracker()
+
+    //flow logic within this call() method
     @Suspendable
     override fun call() {
-        // Flow implementation goes here
+
+        //get the notary identity
+        val notary = serviceHub.networkMapCache.notaryIdentities[0]
+
+        //create the transaction components
+        val outputState = IOUState(iouValue, ourIdentity, otherParty)
+        val cmd = Command(TemplateContract.Commands.Action(), ourIdentity.owningKey)
+
+        //create a transaction builder and pack it with the components
+        val txBuilder = TransactionBuilder(notary = notary)
+                .addOutputState(outputState, TemplateContract.ID)
+                .addCommand(cmd)
+
+        //sign the transaction
+        val signedTx = serviceHub.signInitialTransaction(txBuilder)
+
+        //finalise transaction
+        subFlow(FinalityFlow(signedTx))
     }
 }
 
