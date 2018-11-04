@@ -1,6 +1,7 @@
 package com.template
 
 import co.paralleluniverse.fibers.Suspendable
+import net.corda.core.contracts.Amount
 import net.corda.core.flows.*
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.serialization.SerializationWhitelist
@@ -12,9 +13,14 @@ import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 import net.corda.core.contracts.Command
+import net.corda.core.contracts.Issued
+import net.corda.core.contracts.PartyAndReference
+import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.Party
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
+import java.time.Instant
+import java.util.*
 
 // *****************
 // * API Endpoints *
@@ -64,6 +70,30 @@ class IOUFlow(val iouValue: Int,
         //finalise transaction
         subFlow(FinalityFlow(signedTx))
     }
+}
+
+@InitiatingFlow
+@StartableByRPC
+class FinanceContractFlow(val issuance: PartyAndReference,
+                          val owner: AbstractParty,
+                          val faceValue: Amount<Issued<Currency>>, //what is this?
+                          val maturityDate : Instant) : FlowLogic<Unit>() {
+
+    @Suspendable
+    override fun call() {
+
+        val notary = serviceHub.networkMapCache.notaryIdentities[0]
+
+        val outputState = FinanceContract()
+
+        //some things we need to work on
+
+        //val cmd = Command(FinanceContract.Commands.Issue(), our)
+    }
+
+}
+{
+
 }
 
 // ***********
