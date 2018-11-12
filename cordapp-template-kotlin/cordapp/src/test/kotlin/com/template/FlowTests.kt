@@ -12,9 +12,6 @@ class FlowTests {
     private val b = network.createNode()
 
     init {
-        listOf(a, b).forEach {
-            it.registerInitiatedFlow(Responder::class.java)
-        }
     }
 
     @Before
